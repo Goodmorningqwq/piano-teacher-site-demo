@@ -10,7 +10,10 @@ const AdminApp = lazy(() => import('@/admin/AdminApp'))
 export default function App() {
   return (
     <Routes>
+      {/* Same page, two addresses — this is what makes each language
+          separately indexable and separately shareable. */}
       <Route path="/" element={<Home />} />
+      <Route path="/en" element={<Home />} />
       <Route path="/styleguide" element={<StyleGuide />} />
       <Route
         path="/admin/*"

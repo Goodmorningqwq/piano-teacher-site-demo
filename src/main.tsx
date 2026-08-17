@@ -21,11 +21,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <LanguageProvider>
-          <BrowserRouter>
+        {/* The router sits above the language provider: language is now
+            derived from the URL, so the provider needs route access. */}
+        <BrowserRouter>
+          <LanguageProvider>
             <App />
-          </BrowserRouter>
-        </LanguageProvider>
+          </LanguageProvider>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   </StrictMode>,

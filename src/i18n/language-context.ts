@@ -39,3 +39,37 @@ export const HTML_LANG: Record<Lang, string> = {
   zh: 'zh-Hant',
   en: 'en',
 }
+
+/**
+ * Language lives in the URL so each version is a distinct, linkable,
+ * indexable page:  `/` is 繁體中文, `/en` is English.
+ *
+ * Without this both languages share one URL and differ only by browser
+ * state, which Google cannot see — so only one of them would ever be
+ * indexed, and a shared link would open in whichever language the
+ * recipient's browser happened to pick.
+ */
+export const EN_PREFIX = '/en'
+
+export function langForPath(pathname: string): Lang {
+  return pathname === EN_PREFIX || pathname.startsWith(`${EN_PREFIX}/`) ? 'en' : 'zh'
+}
+
+/** Rewrite a path to its equivalent in the given language. */
+export function pathForLang(pathname: string, lang: Lang): string {
+  const base = pathname.replace(/^\/en(?=\/|$)/, '') || '/'
+  if (lang === 'zh') return base
+  return base === '/' ? EN_PREFIX : `${EN_PREFIX}${base}`
+}
+
+/**
+ * Absolute site origin, for canonical and hreflang tags.
+ *
+ * These must point at the real domain even when rendered on a preview
+ * deployment, so it comes from config rather than window.location.
+ */
+export function siteOrigin(): string {
+  const configured = import.meta.env.VITE_SITE_URL as string | undefined
+  if (configured) return configured.replace(/\/$/, '')
+  return typeof window === 'undefined' ? '' : window.location.origin
+}

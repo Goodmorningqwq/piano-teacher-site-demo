@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useLang } from '@/i18n/language-context'
+import { EN_PREFIX, siteOrigin, useLang } from '@/i18n/language-context'
 import { useTheme } from '@/theme/theme-context'
 import { useProfile, useSettings } from '@/hooks/useContent'
 import { SiteNav } from '@/components/layout/SiteNav'
@@ -33,15 +33,34 @@ export default function Home() {
   const title = text(settings, 'seo_title') || text(profile, 'name')
   const description = text(settings, 'seo_description') || text(profile, 'tagline')
 
+  const origin = siteOrigin()
+  const zhUrl = `${origin}/`
+  const enUrl = `${origin}${EN_PREFIX}`
+  const canonical = lang === 'zh' ? zhUrl : enUrl
+
   return (
     <>
       {/* React 19 hoists these into <head> automatically. */}
       <title>{title}</title>
       <meta name="description" content={description} />
+
+      {/* Tells Google these two URLs are the same page in two languages,
+          so it indexes both and serves the right one — rather than
+          treating them as duplicates and picking one. */}
+      <link rel="canonical" href={canonical} />
+      <link rel="alternate" hrefLang="zh-Hant" href={zhUrl} />
+      <link rel="alternate" hrefLang="en" href={enUrl} />
+      <link rel="alternate" hrefLang="x-default" href={zhUrl} />
+
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:type" content="website" />
+      <meta property="og:url" content={canonical} />
       <meta property="og:locale" content={lang === 'zh' ? 'zh_HK' : 'en_HK'} />
+      <meta
+        property="og:locale:alternate"
+        content={lang === 'zh' ? 'en_HK' : 'zh_HK'}
+      />
       {settings?.hero_image_url && (
         <meta property="og:image" content={settings.hero_image_url} />
       )}
