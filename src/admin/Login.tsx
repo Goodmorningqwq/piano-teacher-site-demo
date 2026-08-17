@@ -105,11 +105,24 @@ function DemoForm() {
  * The teacher receives a link by email and taps it — there is nothing for
  * her to remember and nothing to reset.
  */
+/**
+ * Supabase reports "no such account" as `Signups not allowed for otp`,
+ * because sign-in runs with `shouldCreateUser: false`. Left unhandled it
+ * surfaces as "check the email address", which points at the wrong problem
+ * — the address may be perfectly correct and simply have no account yet.
+ */
+function isNoAccountError(cause: unknown): boolean {
+  const message = cause instanceof Error ? cause.message : String(cause)
+  return /signups? not allowed/i.test(message)
+}
+
 function MagicLinkForm() {
   const { t } = useLang()
   const { signInWithEmail } = useAuth()
   const [email, setEmail] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error' | 'no-account'>(
+    'idle',
+  )
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -120,7 +133,7 @@ function MagicLinkForm() {
       setStatus('sent')
     } catch (cause) {
       console.error('[auth] magic link failed:', cause)
-      setStatus('error')
+      setStatus(isNoAccountError(cause) ? 'no-account' : 'error')
     }
   }
 
@@ -166,9 +179,9 @@ function MagicLinkForm() {
           )}
         </Field>
 
-        {status === 'error' && (
+        {(status === 'error' || status === 'no-account') && (
           <p role="alert" className="text-sm text-danger">
-            {t('loginError')}
+            {t(status === 'no-account' ? 'loginNoAccount' : 'loginError')}
           </p>
         )}
 

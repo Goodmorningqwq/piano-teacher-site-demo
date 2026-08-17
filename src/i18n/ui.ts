@@ -94,6 +94,7 @@ export const zh = {
   loginSending: '傳送中…',
   loginSent: '已寄出！請開啟電郵，按一下裡面的連結就可以登入。',
   loginError: '未能寄出登入連結，請檢查電郵地址是否正確。',
+  loginNoAccount: '這個電郵未有帳戶。請確認電郵地址是否正確，或聯絡幫你設定網站的人。',
   loginNotAllowed: '此電郵沒有管理權限。',
 
   // ---- admin: shared form chrome ----
@@ -296,6 +297,8 @@ export const en: Record<UiKey, string> = {
   loginSending: 'Sending…',
   loginSent: 'Sent. Open your email and tap the link to sign in.',
   loginError: 'Could not send the link. Please check the email address.',
+  loginNoAccount:
+    'There is no account for this email. Check the address, or ask whoever set up the site to add it.',
   loginNotAllowed: 'This email does not have admin access.',
 
   save: 'Save',
