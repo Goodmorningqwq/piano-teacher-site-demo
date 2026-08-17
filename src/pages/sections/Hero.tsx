@@ -3,6 +3,7 @@ import { useLang } from '@/i18n/language-context'
 import { useProfile, useSettings } from '@/hooks/useContent'
 import { Button } from '@/components/ui/Button'
 import { KeyboardDivider } from '@/components/motion/KeyboardDivider'
+import { AnimatedHeadline } from '@/components/motion/AnimatedHeadline'
 
 export function Hero() {
   const { t, text } = useLang()
@@ -65,14 +66,7 @@ export function Hero() {
             </motion.p>
           )}
 
-          <motion.h1
-            className="display-xl"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {headline}
-          </motion.h1>
+          <AnimatedHeadline key={headline} text={headline} className="display-xl" delay={0.2} />
 
           {sub && (
             <motion.p

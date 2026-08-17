@@ -9,20 +9,36 @@
 @import '@fontsource/inter/500.css';
 @import '@fontsource/inter/600.css';
 
+/* 霞鶩文楷 LXGW WenKai TC — the Chinese face for the whole site.
+   A 楷體 (pen-written strokes) rather than a 宋體, chosen to read warm and
+   literary rather than corporate.
+
+   Weight 400 ONLY. The family ships 300/400/700 and no 500; with
+   font-synthesis-weight disabled below, CJK at 600 would resolve UP to 700
+   and silently pull a second ~1MB set of slices. Everything resolves to
+   400 instead, which suits 楷體 anyway.
+
+   This is the sliced stylesheet: 107 unicode-range slices, so a browser
+   fetches only the ones holding characters actually on the page
+   (~15 slices / ~1MB for this site's content). The single-file
+   `chinese-traditional-400.css` would push 1.9MB onto every visitor. */
+@import '@fontsource/lxgw-wenkai-tc/400.css';
+
 /* Theme-invariant scales. Declared here rather than in tokens.css because
    these names are Tailwind namespaces — this makes them real utilities
    (`rounded-md`, `font-display`, `ease-out`) and still emits them as
    :root variables for use in hand-written CSS. */
 @theme {
-  /* Latin faces are self-hosted (small). CJK falls back to the system
-     stack: shipping a webfont for Traditional Chinese would cost several
-     megabytes, and every HK device already has PingFang / JhengHei. */
-  --font-display:
-    'Cormorant Garamond', 'Songti TC', 'Noto Serif CJK TC', 'Noto Serif TC', 'PMingLiU', ui-serif,
-    Georgia, serif;
-  --font-body:
-    'Inter', -apple-system, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', 'Noto Sans TC',
-    ui-sans-serif, system-ui, sans-serif;
+  /* Latin face FIRST, then WenKai.
+     Order is load-bearing: Cormorant/Inter cover Latin, so the browser
+     never reaches for WenKai's Latin slices, and WenKai supplies only CJK.
+
+     The old system-CJK fallbacks (PMingLiU, Songti, PingFang…) are gone
+     deliberately. PMingLiU is a bitmap-era serif and was what made
+     headings look broken on Windows — leaving it as a fallback would just
+     preserve that bug wherever the webfont fails to load. */
+  --font-display: 'Cormorant Garamond', 'LXGW WenKai TC', ui-serif, Georgia, serif;
+  --font-body: 'Inter', 'LXGW WenKai TC', ui-sans-serif, system-ui, sans-serif;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -110,12 +126,15 @@
     transition-delay: 0s !important;
   }
 
-  /* Chinese glyphs are visually denser than Latin at the same size:
-     they need a touch more size and noticeably more leading to
-     stay comfortable. Keyed off <html lang>, set by LanguageProvider. */
+  /* Chinese glyphs are visually denser than Latin at the same size and
+     need more room. Keyed off <html lang>, set by LanguageProvider.
+
+     Retuned for 楷體: its pen-written strokes already carry internal air,
+     so it needs less added leading and no extra tracking compared with the
+     system gothic faces this was originally set for. */
   html[lang='zh-Hant'] body {
-    line-height: 1.9;
-    letter-spacing: 0.01em;
+    line-height: 1.8;
+    letter-spacing: 0;
   }
 
   html[lang='zh-Hant'] {
@@ -133,12 +152,17 @@
     text-wrap: balance;
   }
 
+  /* 楷體 headings: tighter leading than the system faces wanted, and no
+     added tracking — the strokes are already open. Weight drops to 400
+     because WenKai has no 500, and 600 would resolve up to 700 and pull a
+     whole second set of slices. */
   html[lang='zh-Hant'] h1,
   html[lang='zh-Hant'] h2,
   html[lang='zh-Hant'] h3,
   html[lang='zh-Hant'] h4 {
-    line-height: 1.3;
-    letter-spacing: 0.02em;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
   }
 
   p {
@@ -226,6 +250,46 @@
 
   .measure {
     max-width: var(--measure);
+  }
+
+  /* ---- hero headline shimmer ----
+     A highlight travels across the headline every ~7s, like light moving
+     over polished brass. Applied only AFTER the per-character reveal has
+     finished: background-clip:text needs color:transparent, which would
+     wipe out the per-character colour animation if both ran at once. */
+  .shimmer-text {
+    background-image: linear-gradient(
+      100deg,
+      var(--shimmer-base) 42%,
+      var(--shimmer-hi) 50%,
+      var(--shimmer-base) 58%
+    );
+    background-size: 280% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer-sweep 7s var(--ease-in-out) infinite;
+  }
+
+  @keyframes shimmer-sweep {
+    /* Parked for most of the cycle, so the sweep reads as an occasional
+       catch of light rather than a loading skeleton. */
+    0%,
+    62% {
+      background-position: 150% 0;
+    }
+    100% {
+      background-position: -60% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-text {
+      animation: none;
+      background-image: none;
+      color: var(--text);
+    }
   }
 
   /* A hairline that fades out at both ends, like a piano string */

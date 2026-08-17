@@ -80,6 +80,29 @@ export default function StyleGuide() {
           </div>
         </Section>
 
+        <Section title="Chinese face — 霞鶩文楷 LXGW WenKai TC">
+          <div className="flex flex-col gap-5">
+            <p className="text-sm text-muted">
+              Latin comes from Cormorant Garamond / Inter; only CJK falls to WenKai. If a line
+              of English below suddenly looks like a 楷體, the font stack order has been broken.
+            </p>
+            <p className="font-display text-5xl">鋼琴教學 Piano</p>
+            <p className="font-display text-3xl">課程簡介 · Courses</p>
+            <p className="text-base">
+              我相信每一位學生的節奏都不一樣。有人喜歡古典，有人偏愛流行。
+            </p>
+            <p className="text-sm text-muted">
+              ABRSM 一級至八級 · HK$550 每堂 · 45 分鐘
+            </p>
+            <p className="shimmer-text font-display text-4xl">
+              讓每個人都彈出自己的聲音
+            </p>
+            <p className="text-xs text-subtle">
+              ↑ the hero shimmer, running standalone
+            </p>
+          </div>
+        </Section>
+
         <Section title="Keyboard divider">
           <KeyboardDivider />
           <p className="mt-3 text-sm text-muted">Hover the keys — they depress.</p>

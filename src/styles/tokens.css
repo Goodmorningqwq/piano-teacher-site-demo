@@ -53,6 +53,12 @@
   --key-white-edge: #c3bcae;
   --key-black: #121114;
 
+  /* ---- hero headline shimmer ----
+     On black lacquer the travelling band is BRIGHTER than the text. */
+  --shimmer-base: #f4efe6;
+  --shimmer-hi: #ffe9ae;
+  --shimmer-glow: rgb(201 162 74 / 0.55);
+
   /* ---- hero scrim over imagery ---- */
   --scrim: linear-gradient(
     to bottom,
@@ -95,6 +101,12 @@
   --key-white: #ffffff;
   --key-white-edge: #d8cfc0;
   --key-black: #2b2620;
+
+  /* On ivory paper the band must be DEEPER than the text, not lighter —
+     a brighter highlight simply disappears into the background. */
+  --shimmer-base: #211d19;
+  --shimmer-hi: #9a6b2f;
+  --shimmer-glow: rgb(138 94 39 / 0.4);
 
   --scrim: linear-gradient(
     to bottom,
