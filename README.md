@@ -74,9 +74,16 @@ themes and both languages. Use it to catch theme drift after adding components.
 ## Connecting Supabase
 
 1. Create a project at [supabase.com](https://supabase.com) (the free tier is sufficient).
-2. In the dashboard, open **SQL Editor** and run, in order:
-   - `supabase/migrations/0001_init.sql` — tables, row-level security, storage buckets
+2. In the dashboard, open **SQL Editor** and run these **in order, as three separate runs**:
+   - `supabase/migrations/0001_init.sql` — tables, row-level security, grants
    - `supabase/migrations/0002_seed.sql` — placeholder content
+   - `supabase/migrations/0003_storage.sql` — storage buckets and their policies
+
+   Storage is deliberately last and separate. The SQL editor runs each script in a
+   transaction, and `storage.objects` is owned by `supabase_storage_admin`, so a
+   `42501: must be owner of table objects` error there would otherwise roll back the entire
+   schema. If `0003` does fail, everything else is already in place — add the same four
+   policies from **Storage → Policies** in the dashboard instead. `0003` is re-runnable.
 3. **Edit the admin email.** In `0002_seed.sql`, replace `change-me@example.com` with the
    teacher's real address before running it, or afterwards:
    ```sql
