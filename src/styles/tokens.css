@@ -1,0 +1,135 @@
+/* ============================================================
+   Ivory & Midnight — design tokens
+   ------------------------------------------------------------
+   The concept is a concert grand piano: black lacquer body,
+   ivory keys, brass pedals and hardware.
+
+   Dark is the default. The light variant is a warm ivory-paper
+   palette, not an inverted dark theme — it has its own mood.
+
+   RULE: components must never hard-code a colour. Every colour
+   in the app resolves through one of these variables, which is
+   what keeps the light theme from drifting out of sync.
+   ============================================================ */
+
+:root {
+  /* ---- surfaces, back to front ---- */
+  --bg: #0d0c0f; /* piano lacquer */
+  --bg-elevated: #17161a; /* raised panels, nav on scroll */
+  --surface: #201e24; /* cards */
+  --surface-hover: #2a2830;
+  --border: #2e2b33;
+  --border-strong: #423e4a;
+
+  /* ---- text ---- */
+  --text: #f4efe6; /* ivory key */
+  --text-muted: #9a948c;
+  --text-subtle: #948d82; /* clears 4.5:1 on both --bg and --surface */
+
+  /* ---- brass accent ---- */
+  --accent: #c9a24a;
+  --accent-hover: #e0b85c;
+  --accent-contrast: #0d0c0f; /* text sitting ON an accent fill */
+  --accent-soft: rgb(201 162 74 / 0.12);
+  --accent-line: rgb(201 162 74 / 0.32);
+
+  /* ---- feedback ---- */
+  --danger: #e0674f;
+  --danger-soft: rgb(224 103 79 / 0.14);
+  --success: #6fae7c;
+  --success-soft: rgb(111 174 124 / 0.14);
+
+  /* ---- depth ----
+     Named `--elev-*` rather than `--shadow-*`: the latter is a Tailwind
+     theme namespace, and mapping a var onto itself in @theme would be
+     circular. index.css maps these onto `--shadow-*` utilities. */
+  --elev-sm: 0 2px 8px -2px rgb(0 0 0 / 0.5);
+  --elev-md: 0 12px 32px -12px rgb(0 0 0 / 0.65);
+  --elev-lg: 0 24px 60px -20px rgb(0 0 0 / 0.75);
+  --glow-accent: 0 0 32px -6px rgb(201 162 74 / 0.35);
+
+  /* ---- the 88-key motif ---- */
+  --key-white: #efe9dd;
+  --key-white-edge: #c3bcae;
+  --key-black: #121114;
+
+  /* ---- hero scrim over imagery ---- */
+  --scrim: linear-gradient(
+    to bottom,
+    rgb(13 12 15 / 0.15) 0%,
+    rgb(13 12 15 / 0.55) 55%,
+    rgb(13 12 15 / 0.95) 100%
+  );
+
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg: #fbf8f3; /* ivory paper */
+  --bg-elevated: #ffffff;
+  --surface: #f4eee5;
+  --surface-hover: #ebe3d6;
+  --border: #e0d8cb;
+  --border-strong: #c9beac;
+
+  --text: #211d19;
+  --text-muted: #6b635a;
+  --text-subtle: #706962; /* clears 4.5:1 on both --bg and --surface */
+
+  --accent: #8a5e27; /* darkened for AA on ivory */
+  --accent-hover: #6e4a1e;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgb(138 94 39 / 0.1);
+  --accent-line: rgb(138 94 39 / 0.28);
+
+  --danger: #b23c28;
+  --danger-soft: rgb(178 60 40 / 0.1);
+  --success: #3f7d4e;
+  --success-soft: rgb(63 125 78 / 0.1);
+
+  --elev-sm: 0 2px 8px -2px rgb(64 48 26 / 0.1);
+  --elev-md: 0 12px 32px -12px rgb(64 48 26 / 0.18);
+  --elev-lg: 0 24px 60px -20px rgb(64 48 26 / 0.22);
+  --glow-accent: 0 0 32px -6px rgb(138 94 39 / 0.22);
+
+  --key-white: #ffffff;
+  --key-white-edge: #d8cfc0;
+  --key-black: #2b2620;
+
+  --scrim: linear-gradient(
+    to bottom,
+    rgb(251 248 243 / 0.1) 0%,
+    rgb(251 248 243 / 0.5) 55%,
+    rgb(251 248 243 / 0.92) 100%
+  );
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   Non-colour tokens — identical across themes
+
+   Note on what lives where: fonts, radii and easings are declared
+   in index.css's `@theme` block instead of here, because those names
+   are Tailwind theme namespaces (--font-*, --radius-*, --ease-*).
+   Declaring them there makes them Tailwind utilities *and* emits them
+   as :root variables, so `var(--radius-md)` still resolves in plain CSS.
+   Only theme-varying values need to live in this file.
+   ============================================================ */
+
+:root {
+  /* Section rhythm — generous, this is an editorial layout */
+  --section-y: clamp(5rem, 12vw, 10rem);
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --measure: 68ch;
+  --content-max: 1180px;
+
+  --dur-fast: 150ms;
+  --dur-med: 300ms;
+  --dur-slow: 600ms;
+
+  --z-nav: 50;
+  --z-overlay: 90;
+  --z-modal: 100;
+  --z-toast: 110;
+}

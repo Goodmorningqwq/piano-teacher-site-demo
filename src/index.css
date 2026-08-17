@@ -1,0 +1,237 @@
+@import 'tailwindcss';
+@import './styles/tokens.css';
+
+/* Latin display + body faces, self-hosted. CJK uses the system stack. */
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+
+/* Theme-invariant scales. Declared here rather than in tokens.css because
+   these names are Tailwind namespaces — this makes them real utilities
+   (`rounded-md`, `font-display`, `ease-out`) and still emits them as
+   :root variables for use in hand-written CSS. */
+@theme {
+  /* Latin faces are self-hosted (small). CJK falls back to the system
+     stack: shipping a webfont for Traditional Chinese would cost several
+     megabytes, and every HK device already has PingFang / JhengHei. */
+  --font-display:
+    'Cormorant Garamond', 'Songti TC', 'Noto Serif CJK TC', 'Noto Serif TC', 'PMingLiU', ui-serif,
+    Georgia, serif;
+  --font-body:
+    'Inter', -apple-system, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans CJK TC', 'Noto Sans TC',
+    ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Expose the runtime (theme-varying) CSS variables as Tailwind utilities.
+   `inline` keeps them as var() references rather than baking in the
+   value, so every utility re-resolves when [data-theme] flips. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-text: var(--text);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+
+  --shadow-sm: var(--elev-sm);
+  --shadow-md: var(--elev-md);
+  --shadow-lg: var(--elev-lg);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.65;
+    overflow-x: hidden;
+    transition:
+      background-color var(--dur-med) var(--ease-out),
+      color var(--dur-med) var(--ease-out);
+  }
+
+  /* Chinese glyphs are visually denser than Latin at the same size:
+     they need a touch more size and noticeably more leading to
+     stay comfortable. Keyed off <html lang>, set by LanguageProvider. */
+  html[lang='zh-Hant'] body {
+    line-height: 1.9;
+    letter-spacing: 0.01em;
+  }
+
+  html[lang='zh-Hant'] {
+    font-size: 106.25%; /* 17px base */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  html[lang='zh-Hant'] h1,
+  html[lang='zh-Hant'] h2,
+  html[lang='zh-Hant'] h3,
+  html[lang='zh-Hant'] h4 {
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Never trap a keyboard user in an invisible focus ring */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Warm, unobtrusive scrollbar that follows the theme */
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 99px;
+    border: 3px solid var(--bg);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
+
+@layer utilities {
+  /* Standard horizontal frame for every section's content */
+  .content-frame {
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .section-pad {
+    padding-block: var(--section-y);
+  }
+
+  /* Small brass eyebrow label above section headings */
+  .eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  html[lang='zh-Hant'] .eyebrow {
+    letter-spacing: 0.24em;
+  }
+
+  /* Fluid display type used by hero + section headings */
+  .display-xl {
+    font-size: clamp(2.75rem, 8vw, 6rem);
+  }
+  .display-lg {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+  .display-md {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .measure {
+    max-width: var(--measure);
+  }
+
+  /* A hairline that fades out at both ends, like a piano string */
+  .rule-fade {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--border-strong) 20%,
+      var(--border-strong) 80%,
+      transparent
+    );
+  }
+}
+
+/* Users who ask for less motion get none of the decorative kind.
+   Framer Motion respects this too via useReducedMotion(). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

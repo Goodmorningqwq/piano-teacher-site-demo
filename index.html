@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#0d0c0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbf8f3" media="(prefers-color-scheme: light)" />
+
+    <!-- Fallback title/description, shown for the moment before React mounts.
+         React 19 hoists its own <title>/<meta> from the page component but does
+         not remove these, which would leave the document with two of each — so
+         they are tagged and removed once the real ones are in place. -->
+    <title data-static-meta>鋼琴教室 · Piano Studio</title>
+    <meta data-static-meta name="description" content="香港鋼琴教學 · Piano lessons in Hong Kong" />
+
+    <script>
+      // Resolve the theme before first paint.
+      //
+      // Without this, the page renders with the default dark markup and
+      // then flips once React mounts — a white flash on light-mode
+      // devices. Kept inline and tiny so it costs nothing.
+      (function () {
+        try {
+          var stored = localStorage.getItem('pj-theme')
+          var theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark'
+          document.documentElement.dataset.theme = theme
+
+          var lang = localStorage.getItem('pj-lang')
+          document.documentElement.lang = lang === 'en' ? 'en' : 'zh-Hant'
+        } catch (e) {
+          /* private mode — fall through to the markup defaults */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
