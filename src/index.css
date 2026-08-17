@@ -31,6 +31,8 @@
 
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* Gentle at both ends — no sudden arrival on either colour. */
+  --ease-theme: cubic-bezier(0.45, 0.05, 0.25, 1);
 }
 
 /* Expose the runtime (theme-varying) CSS variables as Tailwind utilities.
@@ -83,9 +85,29 @@
     -webkit-font-smoothing: antialiased;
     line-height: 1.65;
     overflow-x: hidden;
-    transition:
-      background-color var(--dur-med) var(--ease-out),
-      color var(--dur-med) var(--ease-out);
+  }
+
+  /* ---- theme cross-fade ----
+     Every themed colour on the page moves together, in lockstep.
+
+     Scoped to a class that only exists while a switch is in flight: a
+     permanent global colour transition would also slow every hover state
+     and fight the component-level transitions. `!important` is what makes
+     the whole page share one duration during the switch, instead of
+     each component keeping its own 150ms/300ms timing.
+
+     `transform` is deliberately absent, so Framer Motion and the card
+     hover lifts are untouched. */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition-property:
+      background-color, background-image, border-color, color, fill, stroke,
+      box-shadow, outline-color, text-decoration-color !important;
+    transition-duration: var(--dur-theme) !important;
+    transition-timing-function: var(--ease-theme) !important;
+    transition-delay: 0s !important;
   }
 
   /* Chinese glyphs are visually denser than Latin at the same size:

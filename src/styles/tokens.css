@@ -128,6 +128,10 @@
   --dur-med: 300ms;
   --dur-slow: 600ms;
 
+  /* Theme cross-fade. Slow enough to read as a deliberate dissolve rather
+     than a flip. Kept in sync with THEME_TRANSITION_MS in ThemeProvider. */
+  --dur-theme: 520ms;
+
   --z-nav: 50;
   --z-overlay: 90;
   --z-modal: 100;

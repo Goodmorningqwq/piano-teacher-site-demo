@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useLang } from '@/i18n/language-context'
 import { useTheme } from '@/theme/theme-context'
 import { cn } from '@/lib/cn'
@@ -12,6 +13,7 @@ const controlBase = cn(
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, toggleTheme } = useTheme()
   const { t } = useLang()
+  const reduceMotion = useReducedMotion()
 
   return (
     <button
@@ -19,9 +21,22 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={toggleTheme}
       title={t('toggleTheme')}
       aria-label={t('toggleTheme')}
-      className={cn(controlBase, 'size-10', className)}
+      className={cn(controlBase, 'relative size-10 overflow-hidden', className)}
     >
-      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      {/* The icons swap on the same arc the page is cross-fading on, so the
+          control does not snap while everything behind it dissolves. */}
+      <AnimatePresence initial={false} mode="popLayout">
+        <motion.span
+          key={theme}
+          className="absolute inset-0 flex items-center justify-center"
+          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, rotate: -75, scale: 0.5 }}
+          animate={{ opacity: 1, rotate: 0, scale: 1 }}
+          exit={reduceMotion ? { opacity: 0 } : { opacity: 0, rotate: 75, scale: 0.5 }}
+          transition={{ duration: reduceMotion ? 0.15 : 0.45, ease: [0.45, 0.05, 0.25, 1] }}
+        >
+          {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+        </motion.span>
+      </AnimatePresence>
     </button>
   )
 }
