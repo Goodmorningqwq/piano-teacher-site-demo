@@ -1,14 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { isSupabaseConfigured } from '@/lib/supabase'
-import { isDemoMode } from '@/lib/demo-store'
-import {
-  createEnquiry,
-  fetchCourses,
-  fetchEnquiries,
-  fetchProfile,
-  fetchSettings,
-  fetchVideos,
-} from '@/lib/backend'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   fallbackCourses,
   fallbackProfile,
@@ -20,71 +10,34 @@ import type { Course, Profile, SiteSettings, Video } from '@/lib/database.types'
 export const contentKeys = {
   profile: ['profile'] as const,
   settings: ['site_settings'] as const,
-  courses: (includeHidden: boolean) => ['courses', { includeHidden }] as const,
-  videos: (includeHidden: boolean) => ['videos', { includeHidden }] as const,
-  enquiries: ['enquiries'] as const,
+  courses: ['courses'] as const,
+  videos: ['videos'] as const,
 }
-
-/** A backend exists when either Supabase is configured or demo mode is on. */
-const hasBackend = isSupabaseConfigured || isDemoMode
 
 /**
- * Public reads fall back to bundled content on any failure.
- *
- * A visitor should never see an error screen because the database blipped —
- * the placeholder copy is always better than nothing. Admin reads
- * (`includeHidden`) deliberately do NOT get this treatment: the teacher must
- * see a real error rather than edit content that silently failed to load.
+ * The backend was retired (see src/lib/supabase.ts): every read resolves to
+ * the bundled content. The hooks keep their shape so the sections did not
+ * have to change.
  */
-async function withFallback<T>(load: () => Promise<T>, fallback: T): Promise<T> {
-  if (!hasBackend) return fallback
-  try {
-    return await load()
-  } catch (error) {
-    console.error('[content] falling back to bundled content:', error)
-    return fallback
-  }
-}
-
 export function useProfile() {
-  return useQuery({
-    queryKey: contentKeys.profile,
-    queryFn: () => withFallback<Profile>(fetchProfile, fallbackProfile),
-  })
+  return useQuery({ queryKey: contentKeys.profile, queryFn: async (): Promise<Profile> => fallbackProfile })
 }
 
 export function useSettings() {
+  return useQuery({ queryKey: contentKeys.settings, queryFn: async (): Promise<SiteSettings> => fallbackSettings })
+}
+
+export function useCourses() {
   return useQuery({
-    queryKey: contentKeys.settings,
-    queryFn: () => withFallback<SiteSettings>(fetchSettings, fallbackSettings),
+    queryKey: contentKeys.courses,
+    queryFn: async (): Promise<Course[]> => fallbackCourses.filter((c) => c.is_published),
   })
 }
 
-export function useCourses({ includeHidden = false } = {}) {
+export function useVideos() {
   return useQuery({
-    queryKey: contentKeys.courses(includeHidden),
-    queryFn: () =>
-      includeHidden
-        ? fetchCourses(true)
-        : withFallback<Course[]>(() => fetchCourses(false), fallbackCourses),
-  })
-}
-
-export function useVideos({ includeHidden = false } = {}) {
-  return useQuery({
-    queryKey: contentKeys.videos(includeHidden),
-    queryFn: () =>
-      includeHidden
-        ? fetchVideos(true)
-        : withFallback<Video[]>(() => fetchVideos(false), fallbackVideos),
-  })
-}
-
-export function useEnquiries() {
-  return useQuery({
-    queryKey: contentKeys.enquiries,
-    queryFn: fetchEnquiries,
-    enabled: hasBackend,
+    queryKey: contentKeys.videos,
+    queryFn: async (): Promise<Video[]> => fallbackVideos.filter((v) => v.is_published),
   })
 }
 
@@ -95,25 +48,24 @@ export type EnquiryInput = {
   message: string
 }
 
+/**
+ * Static site: the form hands the enquiry to the visitor's mail app,
+ * addressed to the teacher, with the fields filled into the body.
+ */
 export function useSubmitEnquiry() {
   return useMutation({
-    mutationFn: (input: EnquiryInput) =>
-      createEnquiry({
-        name: input.name.trim(),
-        email: input.email.trim(),
-        phone: input.phone?.trim() || null,
-        message: input.message.trim(),
-      }),
-  })
-}
+    mutationFn: async (input: EnquiryInput) => {
+      const name = input.name.trim()
+      const email = input.email.trim()
+      const phone = input.phone?.trim()
+      const subject = encodeURIComponent(`鋼琴課程查詢 · ${name}`)
+      const body = encodeURIComponent(`${input.message.trim()}
 
-/** Invalidate every content query — used after admin writes. */
-export function useInvalidateContent() {
-  const queryClient = useQueryClient()
-  return () => {
-    void queryClient.invalidateQueries({ queryKey: ['profile'] })
-    void queryClient.invalidateQueries({ queryKey: ['site_settings'] })
-    void queryClient.invalidateQueries({ queryKey: ['courses'] })
-    void queryClient.invalidateQueries({ queryKey: ['videos'] })
-  }
+—
+${name}
+${email}${phone ? `
+${phone}` : ''}`)
+      window.location.href = `mailto:${fallbackProfile.email}?subject=${subject}&body=${body}`
+    },
+  })
 }

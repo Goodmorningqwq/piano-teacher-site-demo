@@ -1,5 +1,11 @@
 # Piano Teacher Website
 
+> **Status (2026-09-21): backend retired.** The site is fully static now — content is
+> served from `src/lib/fallback-content.ts`, the enquiry form opens the visitor's mail
+> app addressed to the teacher, and `/admin` has been removed. The Supabase project can
+> be deleted; `VITE_SUPABASE_*` env vars are no longer read. The Supabase setup below is
+> kept for history and for reviving the admin if the site is ever taken up again.
+
 A bilingual (繁體中文 / English) single-page site for a Hong Kong piano teacher, with a
 purpose-built `/admin` panel so she can maintain it herself.
 
